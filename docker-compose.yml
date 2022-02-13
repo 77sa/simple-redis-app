@@ -1,0 +1,19 @@
+services:
+  postgres:
+    build: ./database/postgres
+    ports: 
+      - 5000:5432
+  crud:
+    build: ./services/crud
+    environment:
+      - ENV=${ENV}
+    volumes:
+      - ./services/crud/src:/usr/src/app/src
+      - ./services/crud/nodemon.json:/usr/src/app/nodemon.json
+    ports:
+      - 8000:8000
+  redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass redis
+    ports:
+     - 6379:6379

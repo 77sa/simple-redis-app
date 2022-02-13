@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL UNIQUE,
+    title VARCHAR(255) NOT NULL,
+    body VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
