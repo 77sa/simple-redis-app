@@ -12,8 +12,28 @@ services:
       - ./services/crud/nodemon.json:/usr/src/app/nodemon.json
     ports:
       - 8000:8000
+    depends_on:
+      - rabbitmq
+  redis-posts-worker:
+    build: ./services/redis-posts-worker
+    environment:
+      - ENV=${ENV}
+    hostname: redis-posts-worker
+    volumes:
+      - ./services/redis-posts-worker/src:/usr/src/app/src
+      - ./services/redis-posts-worker/nodemon.json:/usr/src/app/nodemon.json
+      - ./protos:/usr/src/app/protos
+    ports:
+      - 8001:8000
+    depends_on:
+      - rabbitmq
   redis:
-    image: "redis:alpine"
+    image: redis:alpine
     command: redis-server --requirepass redis
     ports:
      - 6379:6379
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 8080:15672
+      - 5672:5672

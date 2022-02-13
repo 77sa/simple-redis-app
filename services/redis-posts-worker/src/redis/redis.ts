@@ -1,13 +1,8 @@
-import redis from "./client";
-
-export enum RedisKeys {
-    Posts = "posts",
-    Post = "post:",
-}
+import redis, { RedisKeys } from "./client";
 
 const getParsedCache = async () => {
     const cache = await redis.get(RedisKeys.Posts);
-    if (!cache) return;
+    if (!cache) return [];
 
     return JSON.parse(cache);
 };

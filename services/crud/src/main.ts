@@ -1,16 +1,23 @@
 import express, { Request, Response } from "express";
 import { errorHandler } from "./middleware/error";
 import db, { PG } from "./db/pool";
-import redis from "./redis/client";
-import {
-    addToCache,
-    deleteFromCache,
-    updateCache,
-    RedisKeys,
-} from "./redis/redis";
+import redis, { RedisKeys } from "./redis/client";
 
+import rabbitmq, { RMQFunctions, Queue } from "./rabbitmq/rabbitmq";
+
+enum CacheAction {
+    ADD = "ADD",
+    UPDATE = "UPDATE",
+    DELETE = "DELETE",
+}
+
+let rmq: RMQFunctions;
+let timeout = process.env.ENV == "DEV" ? 1000 : 15000;
 (async () => {
     await redis.connect();
+    setTimeout(async () => {
+        rmq = await rabbitmq("amqp://rabbitmq", Queue.Posts);
+    }, timeout);
 })();
 
 const app = express();
@@ -57,7 +64,11 @@ app.post("/", async (req: Request, res: Response) => {
         }
     );
 
-    await addToCache(item.rows[0]);
+    const message = JSON.stringify({
+        item: item.rows[0],
+        action: CacheAction.ADD,
+    });
+    rmq.sendMessage(message);
 
     return res.json({ message: "Success" });
 });
@@ -80,7 +91,11 @@ app.patch("/", async (req: Request, res: Response) => {
     if (!item.rowCount)
         return res.status(404).json({ message: "Post not found" });
 
-    await updateCache(item.rows[0]);
+    const message = JSON.stringify({
+        item: item.rows[0],
+        action: CacheAction.UPDATE,
+    });
+    rmq.sendMessage(message);
 
     return res.json({ message: "Success" });
 });
@@ -96,7 +111,11 @@ app.delete("/:id", async (req: Request, res: Response) => {
     if (!item.rowCount)
         return res.status(404).json({ message: "Post not found" });
 
-    await deleteFromCache(item.rows[0]);
+    const message = JSON.stringify({
+        item: item.rows[0],
+        action: CacheAction.DELETE,
+    });
+    rmq.sendMessage(message);
 
     return res.json({ message: "Success" });
 });

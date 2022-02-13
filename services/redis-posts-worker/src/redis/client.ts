@@ -6,7 +6,6 @@ const client = redis.createClient({ url });
 
 export enum RedisKeys {
     Posts = "posts",
-    Post = "post:",
 }
 
 export default client;

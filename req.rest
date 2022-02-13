@@ -17,9 +17,9 @@ PATCH  http://localhost:8000
 Content-Type: application/json
 
 {
-    "id": 8476,
+    "id": 6023,
     "title": "updated"
 }
 
 ###
-DELETE http://localhost:8000/8476
+DELETE http://localhost:8000/6023
