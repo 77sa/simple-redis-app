@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/main.ts",
+    "dev": "nodemon src/cluster.ts",
     "watch": "tsc -w",
-    "dev2": "node dist/main.js"
+    "dev2": "node dist/cluster.js"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,6 @@ enum CacheAction {
 
 const processMessage = (message: any) => {
     const parsedMessage = JSON.parse(message.content.toString());
-    console.log(parsedMessage);
 
     switch (parsedMessage.action) {
         case CacheAction.ADD:

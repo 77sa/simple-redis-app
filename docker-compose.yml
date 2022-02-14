@@ -22,7 +22,6 @@ services:
     volumes:
       - ./services/redis-posts-worker/src:/usr/src/app/src
       - ./services/redis-posts-worker/nodemon.json:/usr/src/app/nodemon.json
-      - ./protos:/usr/src/app/protos
     ports:
       - 8001:8000
     depends_on:
