@@ -1,4 +1,4 @@
-import rabbitmq, { RMQFunctions, Queue } from "./rabbitmq/rabbitmq";
+import rabbitmq, { RMQ, Queue } from "./rabbitmq/rabbitmq";
 import redis from "./redis/client";
 import { addToCache, deleteFromCache, updateCache } from "./redis/redis";
 
@@ -27,12 +27,19 @@ const processMessage = (message: any) => {
     }
 };
 
-let rmq: RMQFunctions;
-let timeout = process.env.ENV == "DEV" ? 1000 : 15000;
+let rmq: RMQ;
 (async () => {
     await redis.connect();
-    setTimeout(async () => {
-        rmq = await rabbitmq("amqp://rabbitmq", Queue.Posts);
-        rmq.receiveMessages(processMessage, true);
-    }, timeout);
+
+    let retries = 5;
+    while (retries) {
+        try {
+            rmq = await rabbitmq("amqp://rabbitmq", Queue.Posts);
+            rmq.receiveMessages(processMessage, true);
+            break;
+        } catch (err) {
+            retries -= 1;
+            await new Promise((res) => setTimeout(res, 5000));
+        }
+    }
 })();

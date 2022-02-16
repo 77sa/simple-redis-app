@@ -8,7 +8,7 @@ interface Options {
     durable: boolean;
 }
 
-export interface RMQFunctions {
+export interface RMQ {
     sendMessage: (message: string) => void;
     receiveMessages: (callback: Function, noAck: boolean) => void;
 }
@@ -17,7 +17,7 @@ const rabbitmq = async (
     url: string,
     queue: string,
     opts?: Options
-): Promise<RMQFunctions> => {
+): Promise<RMQ> => {
     try {
         const connection = await amqp.connect(url);
         const channel = await connection.createChannel();

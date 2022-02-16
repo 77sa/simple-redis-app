@@ -1,0 +1,1 @@
+docker run --network container:simple-redis-app-crud-1 -v `pwd`:/src -i loadimpact/k6 run - <src/main.js

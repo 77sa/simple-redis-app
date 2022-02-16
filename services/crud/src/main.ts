@@ -3,7 +3,7 @@ import { errorHandler } from "./middleware/error";
 import db, { PG } from "./db/pool";
 import redis, { RedisKeys } from "./redis/client";
 
-import rabbitmq, { RMQFunctions, Queue } from "./rabbitmq/rabbitmq";
+import rabbitmq, { RMQ, Queue } from "./rabbitmq/rabbitmq";
 
 enum CacheAction {
     ADD = "ADD",
@@ -11,13 +11,20 @@ enum CacheAction {
     DELETE = "DELETE",
 }
 
-let rmq: RMQFunctions;
-let timeout = process.env.ENV == "DEV" ? 1000 : 15000;
+let rmq: RMQ;
 (async () => {
     await redis.connect();
-    setTimeout(async () => {
-        rmq = await rabbitmq("amqp://rabbitmq", Queue.Posts);
-    }, timeout);
+
+    let retries = 5;
+    while (retries) {
+        try {
+            rmq = await rabbitmq("amqp://rabbitmq", Queue.Posts);
+            break;
+        } catch (err) {
+            retries -= 1;
+            await new Promise((res) => setTimeout(res, 5000));
+        }
+    }
 })();
 
 const app = express();

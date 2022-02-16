@@ -8,7 +8,7 @@ interface Options {
     durable: boolean;
 }
 
-export interface RMQFunctions {
+export interface RMQ {
     sendMessage: (message: string) => void;
     receiveMessages: (callback: Function, noAck: boolean) => void;
 }
